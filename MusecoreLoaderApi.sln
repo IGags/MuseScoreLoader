@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "MusecoreLoaderApi\Api.csproj", "{241DF463-2654-467D-84FF-9E47E762B58B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logic", "Logic\Logic.csproj", "{B223702A-6F33-4695-849B-63F91D7DDBF3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{241DF463-2654-467D-84FF-9E47E762B58B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{241DF463-2654-467D-84FF-9E47E762B58B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{241DF463-2654-467D-84FF-9E47E762B58B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{241DF463-2654-467D-84FF-9E47E762B58B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B223702A-6F33-4695-849B-63F91D7DDBF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B223702A-6F33-4695-849B-63F91D7DDBF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B223702A-6F33-4695-849B-63F91D7DDBF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B223702A-6F33-4695-849B-63F91D7DDBF3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {069738EB-B677-4E25-9A82-B3C085046A9C}
+	EndGlobalSection
+EndGlobal
