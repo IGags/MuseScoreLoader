@@ -1,7 +1,4 @@
 ﻿using Logic;
-using Microsoft.AspNetCore.Builder;
-using QuestPDF;
-using QuestPDF.Infrastructure;
 
 namespace Api
 {

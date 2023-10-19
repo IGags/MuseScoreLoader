@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -68,6 +69,14 @@ namespace Logic.Services.SequenceSvgLoaderService
                 responseList.Add(response);
             }
 
+            if (responseSvgList.Count == 1)
+            {
+                await using var s1 = await responseList.First().Files.First().FileStreamAsync();
+                using var ms3 = new MemoryStream();
+                await s1.CopyToAsync(ms3);
+                return ms3.ToArray();
+            }
+            
             var paramList = responseList.Select(x => new ConvertApiFileParam(x)).ToList();
             var mergeTask = await _convertApi.ConvertAsync("pdf", "merge", paramList);
             await using var stream = await mergeTask.Files.First().FileStreamAsync();

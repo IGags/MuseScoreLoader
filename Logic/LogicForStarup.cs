@@ -1,4 +1,5 @@
 ﻿using ConvertApiDotNet;
+using Logic.Services;
 using Logic.Services.MuseScoreConnectionService;
 using Logic.Services.MuseScoreConnectionService.Interfaces;
 using Logic.Services.SequenceSvgLoaderService;
@@ -16,7 +17,7 @@ namespace Logic
         {
             collection.AddTransient<IMuseScoreConnectionService, MuseScoreConnectionService>();
             collection.AddTransient<ISequenceSvgLoaderService, SequenceSvgLoaderService>();
-            collection.AddSingleton<ConvertApi>(x => new ConvertApi("1C9bCnKRn5pAqinX"));
+            collection.AddTransient(x => new ConvertApi(KeyStorageService.Key));
             
             return collection;
         }

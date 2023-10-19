@@ -2,6 +2,7 @@
 using Api.Filters;
 using Logic.Enums;
 using Logic.Models;
+using Logic.Services;
 using Logic.Services.MuseScoreConnectionService.Interfaces;
 using Logic.Services.SequenceSvgLoaderService.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -57,6 +58,19 @@ namespace Api.Controllers.MusescoreProvider
             var model = new MuseScoreConnectionModel(id, MuseScoreContentType.Svg);
             var pdf = await sequenceSvgLoaderService.LoadPdfDataAsync(model);
             return File(pdf, "application/pdf", $"{outFileName}.pdf");
+        }
+
+        /// <summary>
+        /// Смена ключа
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        [HttpPost("replace-key/{key}")]
+        public async Task<IActionResult> ReplaceKeyAsync([FromRoute] string key)
+        {
+            KeyStorageService.Key = key;
+            System.IO.File.WriteAllText("key.txt", key);
+            return Ok();
         }
     }
 }
