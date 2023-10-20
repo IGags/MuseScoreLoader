@@ -65,11 +65,10 @@ namespace Api.Controllers.MusescoreProvider
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        [HttpPost("replace-key/{key}")]
-        public async Task<IActionResult> ReplaceKeyAsync([FromRoute] string key)
+        [HttpPost("add-key/{key}")]
+        public async Task<IActionResult> AddKeyAsync([FromRoute] string key)
         {
-            KeyStorageService.Key = key;
-            System.IO.File.WriteAllText("key.txt", key);
+            KeyStorageService.AddKey(key);
             return Ok();
         }
     }

@@ -17,7 +17,6 @@ namespace Logic
         {
             collection.AddTransient<IMuseScoreConnectionService, MuseScoreConnectionService>();
             collection.AddTransient<ISequenceSvgLoaderService, SequenceSvgLoaderService>();
-            collection.AddTransient(x => new ConvertApi(KeyStorageService.Key));
             
             return collection;
         }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ConvertApiDotNet;
 using ConvertApiDotNet.Model;
@@ -16,12 +15,10 @@ namespace Logic.Services.SequenceSvgLoaderService
     internal class SequenceSvgLoaderService : ISequenceSvgLoaderService
     {
         private readonly IMuseScoreConnectionService _museScoreConnectionService;
-        private readonly ConvertApi _convertApi;
 
-        public SequenceSvgLoaderService(IMuseScoreConnectionService museScoreConnectionService, ConvertApi convertApi)
+        public SequenceSvgLoaderService(IMuseScoreConnectionService museScoreConnectionService)
         {
             _museScoreConnectionService = museScoreConnectionService;
-            _convertApi = convertApi;
         }
 
         ///<inheritdoc />
@@ -48,24 +45,17 @@ namespace Logic.Services.SequenceSvgLoaderService
                 model.IncrementIndex();
             } while (isContinue);
 
-            var user = await _convertApi.GetUserAsync();
+            var api = new ConvertApi(KeyStorageService.GetKey(responseSvgList.Count == 1 ? 1 : responseSvgList.Count + 1));
+            var user = await api.GetUserAsync();
             var remain = user.ConversionsTotal - user.ConversionsConsumed;
-            if (remain - 1 < responseSvgList.Count)
-            {
-                throw new Exception("Не хватает конверсий");
-            }
-            else
-            {
-                Console.WriteLine($"Конверсий осталось: {remain - responseSvgList.Count - 1}");
-            }
-            
-            
+            Console.WriteLine($"Конверсий осталось: {remain - responseSvgList.Count - 1}");
+
             var responseList = new List<ConvertApiResponse>();
             for (var i = 0; i < responseSvgList.Count; i++)
             {
                 using var ms = new MemoryStream(responseSvgList[i]);
                 var param = new ConvertApiFileParam(ms, "test.svg");
-                var response = await _convertApi.ConvertAsync("svg", "pdf", param);
+                var response = await api.ConvertAsync("svg", "pdf", param);
                 responseList.Add(response);
             }
 
@@ -78,7 +68,7 @@ namespace Logic.Services.SequenceSvgLoaderService
             }
             
             var paramList = responseList.Select(x => new ConvertApiFileParam(x)).ToList();
-            var mergeTask = await _convertApi.ConvertAsync("pdf", "merge", paramList);
+            var mergeTask = await api.ConvertAsync("pdf", "merge", paramList);
             await using var stream = await mergeTask.Files.First().FileStreamAsync();
             using var ms2 = new MemoryStream();
             await stream.CopyToAsync(ms2);
