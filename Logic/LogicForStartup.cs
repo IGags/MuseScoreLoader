@@ -11,7 +11,7 @@ namespace Logic
     /// <summary>
     /// Добавление логики в di
     /// </summary>
-    public static class LogicForStarup
+    public static class LogicForStartup
     {
         public static IServiceCollection AddLogic(this IServiceCollection collection)
         {

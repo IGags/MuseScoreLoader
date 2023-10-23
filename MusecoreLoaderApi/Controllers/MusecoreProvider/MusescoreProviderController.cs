@@ -71,5 +71,15 @@ namespace Api.Controllers.MusescoreProvider
             KeyStorageService.AddKey(key);
             return Ok();
         }
+        
+        /// <summary>
+        /// Получение конверсий всего
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("total-conversions")]
+        public async Task<IActionResult> GetTotalConversions()
+        {
+            return Ok(KeyStorageService.GetTotalConversions());
+        }
     }
 }

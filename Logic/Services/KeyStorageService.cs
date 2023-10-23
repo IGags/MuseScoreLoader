@@ -2,27 +2,41 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using ConvertApiDotNet;
 
 namespace Logic.Services;
 
 public static class KeyStorageService
 {
-    private const string KeyPath = "key.txt";
-    private static List<(int, string)> _keys = new ();
+    public const string KeyPath = "key.txt";
+    private static List<ApiKey> _keys = new ();
+    private static object _syncRoot = new();
 
+    public static int GetTotalConversions()
+    {
+        lock (_syncRoot)
+        {
+            return _keys.Select(x => x.UsageCount).Sum();
+        }
+    }
+    
     public static string GetKey(int usageCount)
     {
         try
         {
-            var key = _keys.First(x => x.Item1 > usageCount);
-            key.Item1 -= usageCount;
-            if (key.Item1 == 0)
+            lock (_syncRoot)
             {
+                var key = _keys.First(x => x.UsageCount >= usageCount);
                 _keys.Remove(key);
-                RewriteKeys(_keys);
+                key = key with {UsageCount = key.UsageCount - usageCount};
+                if (key.UsageCount == 0)
+                {
+                    RewriteKeys(_keys);
+                }
+                _keys.Add(key);
+                return key.Secret;
             }
-            return key.Item2;
         }
         catch (Exception)
         {
@@ -33,46 +47,45 @@ public static class KeyStorageService
 
     public static void AddKey(string key)
     {
-        if (_keys.Any(x => x.Item2.Equals(key)))
+        lock (_syncRoot)
         {
-            Console.WriteLine("Такой ключ уже есть");
-            return;
+            if (_keys.Any(x => x.Secret.Equals(key)))
+            {
+                Console.WriteLine("Такой ключ уже есть");
+                return;
+            }
+            try
+            {
+                _keys.Add(new ApiKey(key, ValidateKey(key)));
+                RewriteKeys(_keys);
+            }
+            catch (Exception e) { }
         }
-        try
-        {
-            _keys.Add((ValidateKey(key), key));
-            RewriteKeys(_keys);
-        }
-        catch (Exception e) { }
     }
     
     static KeyStorageService()
     {
-        if (File.Exists(KeyPath))
+        var keys = File.ReadAllText(KeyPath).Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        _keys = ValidateKeys(keys.ToList());
+        if (_keys.Count != 0)
         {
-            var keys = File.ReadAllText(KeyPath).Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            _keys = ValidateKeys(keys.ToList());
-            if (_keys.Count != 0)
-            {
-                RewriteKeys(_keys);
-                return;
-            }
+            RewriteKeys(_keys);
+            return;
         }
-        
         Console.WriteLine("Добавьте ключей через рест");
     }
 
-    private static void RewriteKeys(List<(int, string)> keyList) =>
-        File.WriteAllText(KeyPath, string.Join('\n', _keys.Select(x => x.Item2)));
+    private static void RewriteKeys(List<ApiKey> keyList) =>
+        File.WriteAllText(KeyPath, string.Join('\n', _keys.Select(x => x.Secret)));
     
-    private static List<(int, string)> ValidateKeys(List<string> keys)
+    private static List<ApiKey> ValidateKeys(List<string> keys)
     {
-        var keyList = new List<(int, string)>();
+        var keyList = new List<ApiKey>();
         foreach (var key in keys)
         {
             try
             {
-                keyList.Add((ValidateKey(key), key));
+                keyList.Add(new ApiKey(key, ValidateKey(key)));
             }
             catch { }
         }
@@ -100,4 +113,6 @@ public static class KeyStorageService
             throw;
         }
     }
+
+    private record ApiKey(string Secret, int UsageCount);
 }
